@@ -1,0 +1,25 @@
+version: '2'
+services:
+  # Add as many notebooks as GPUs
+  {% for i in range(N_GPU) %}
+  notebook{{i}}:
+    build: .
+    env_file: .env
+    ports:
+      - "2018:8888"
+    devices:
+      - /dev/nvidia{{i}}
+    volumes:
+      - $HOME/Dropbox/notebooks/nips2018:/notebooks
+      - /tmp:/tmp
+      - /tmp/.X11-unix:/tmp/.X11-unix
+      - /home/fabee/code/attorch:/src/attorch
+      - /home/fabee/code/Sinz2018_NIPS/nips2018:/src/Sinz2018_NIPS/nips2018
+      - /mnt/scratch07/cortex_ex_machina_external:/external2
+      - /mnt/scratch07/nips2018:/external
+      - /mnt/lab/microns/data:/data
+      #- /home/fabee/code/cortex_ex_machina/dj_local_conf.json:/root/.datajoint_config.json
+    environment:
+      - DISPLAY=$DISPLAY
+
+  {% endfor %}
