@@ -1,24 +1,18 @@
-from collections import OrderedDict, namedtuple
+from collections import OrderedDict
 from itertools import repeat
 from pprint import pformat
 
-from ._utils import Learner, CorePlusReadoutModel, compute_scores
-
-from ..utils.git import gitlog
+import numpy as np
+import torch
+from attorch.losses import PoissonLoss3d
 
 import datajoint as dj
-
-from attorch.losses import PoissonLoss3d, PoissonLoss
-
-from ..utils.logging import Messager
-from .data import MovieScan
-from ..utils import set_seed
-import numpy as np
-from .data import MovieMultiDataset, InputResponse
-from .parameters import Seed, CoreConfig, ReadoutConfig, DataConfig, ShifterConfig, ModulatorConfig, ConfigBase
+from ._utils import Learner, CorePlusReadoutModel
+from .parameters import Seed, DataConfig, ConfigBase
 from .parameters import schema as parameter_schema
-import torch
-
+from ..utils import set_seed
+from ..utils.git import gitlog
+from ..utils.logging import Messager
 
 schema = dj.schema('nips2018_models', locals())
 
@@ -219,8 +213,6 @@ class TrainConfig(ConfigBase, dj.Lookup, Messager):
                                                )
             model.eval()
             return model
-            
-
 
     class MultiGPUStopGrad(dj.Part, Messager):
         definition = """
@@ -283,7 +275,7 @@ class TrainConfig(ConfigBase, dj.Lookup, Messager):
                 outputs = model(inputs, readout_key, eye_pos=eye_pos, behavior=beh)
                 return (criterion(outputs, targets)
                         + (model.core.regularizer() / grad_passes if not model.readout[readout_key].stop_grad else 0)
-                        +  model.readout.regularizer(readout_key).cuda(0)
+                        + model.readout.regularizer(readout_key).cuda(0)
                         + (model.shifter.regularizer(readout_key) if model.shift else 0)
                         + (model.modulator.regularizer(readout_key) if model.modulate else 0)) / acc
 
@@ -371,26 +363,6 @@ class Encoder(dj.Computed, Learner, CorePlusReadoutModel, Messager):
             with self.connection.transaction:
                 self.TestScores().insert(scores, ignore_extra_fields=True)
                 self.UnitTestScores().insert(unit_scores, ignore_extra_fields=True)
-
-    # @property
-    # def key_source(self):
-    #     ro_restr = [
-    #         CoreConfig.StackedFeatureGRU().proj() * ReadoutConfig.SpatialTransformerPooled3d().proj('pool_steps') \
-    #         & 'pool_steps=5',
-    #         CoreConfig.StackedFeatureGRU().proj() * ReadoutConfig.SpatialTransformer3dSharedGrid().proj('pool_steps') \
-    #         & 'pool_steps=5',
-    #         CoreConfig.StackedFeatureGRU().proj() * ReadoutConfig.ST3dSharedGridStopGradient().proj('pool_steps') \
-    #         & 'pool_steps=5',
-    #         CoreConfig.StackedFeatureStatic().proj() * ReadoutConfig.SpatialTransformerPooled3d().proj('pool_steps') \
-    #         & 'pool_steps=5',
-    #         CoreConfig.Conv3dLinear().proj() * ReadoutConfig.SpatialTransformerPooled3d().proj('pool_steps') \
-    #         & 'pool_steps=4',
-    #     ]
-    #     params = MovieMultiDataset() * CoreConfig() \
-    #              * ReadoutConfig() \
-    #              * DataConfig() * Seed() \
-    #              * ShifterConfig() * ModulatorConfig() * TrainConfig()
-    #     return params
 
     def _make_tuples(self, key):
         self.msg('Populating\n', pformat(key, indent=10), flush=True)

@@ -19,3 +19,9 @@ def rename(rel, prefix='new_', exclude=[]):
     original = [x for x in attrs if x not in exclude]
     name_map = {prefix+x: x for x in original}
     return rel.proj(**name_map)
+
+
+class ComputeStub:
+
+    def make(selfk, key):
+        pass

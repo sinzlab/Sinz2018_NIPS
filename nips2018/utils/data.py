@@ -1,19 +1,11 @@
 import hashlib
+import os.path as op
 import pathlib
-from _warnings import warn
-from collections import OrderedDict
+import pickle
 from shutil import copyfile
 from warnings import warn
 
-import torch
-from scipy import signal
-import pickle
-import os.path as op
-from torch.utils.data.sampler import Sampler
 from tqdm import tqdm
-
-import datajoint as dj
-
 
 
 def list_hash(values):
@@ -30,7 +22,7 @@ from scipy.interpolate import InterpolatedUnivariateSpline, interp1d
 import numpy as np
 import h5py
 import os
-from collections import OrderedDict, defaultdict
+from collections import OrderedDict
 
 
 class SplineCurve:
@@ -99,7 +91,7 @@ def fill_nans(x, preserve_gap=None):
     """
     if preserve_gap is not None:
         assert preserve_gap % 2 == 1, 'can only efficiently preserve odd gaps'
-        keep = np.convolve(np.convolve(1*np.isnan(x), np.ones(preserve_gap), mode='same') == preserve_gap,
+        keep = np.convolve(np.convolve(1 * np.isnan(x), np.ones(preserve_gap), mode='same') == preserve_gap,
                            np.ones(preserve_gap, dtype=bool), mode='same')
     else:
         keep = np.zeros(len(x), dtype=bool)
@@ -362,19 +354,19 @@ class NaNSpline(InterpolatedUnivariateSpline):
         if np.any(xnan):
             warn('Found nans in the x-values. Replacing them with linear interpolation')
         ynan = np.isnan(y)
-        w = xnan | ynan # get nans
-        x, y = map(np.array, [x, y]) # copy arrays
+        w = xnan | ynan  # get nans
+        x, y = map(np.array, [x, y])  # copy arrays
         y[ynan] = 0
         x[xnan] = np.interp(np.where(xnan)[0], np.where(~xnan)[0], x[~xnan])
-        super().__init__(x[~w], y[~w], **kwargs) # assign zero weight to nan positions
+        super().__init__(x[~w], y[~w], **kwargs)  # assign zero weight to nan positions
 
-        self.nans = interp1d(x, 1*w, kind='linear')
+        self.nans = interp1d(x, 1 * w, kind='linear')
 
     def __call__(self, x, **kwargs):
         ret = np.zeros_like(x)
         newnan = np.zeros_like(x)
 
-        old_nans =  np.isnan(x)
+        old_nans = np.isnan(x)
         newnan[old_nans] = 1
         newnan[~old_nans] = self.nans(x[~old_nans])
 

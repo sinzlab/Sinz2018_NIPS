@@ -3,24 +3,23 @@ from _operator import attrgetter
 from collections import OrderedDict, namedtuple
 from contextlib import redirect_stdout
 from itertools import chain
-from multiprocessing.pool import Pool
 from pprint import pformat
 
-import datajoint as dj
 import numpy as np
 import torch
-
 from attorch.dataset import to_variable
 from attorch.layers import Elu1
 from attorch.train import early_stopping, cycle_datasets
-from ..architectures.base import CorePlusReadout3d
+from scipy.stats import stats
+from tqdm import tqdm
+
+import datajoint as dj
 from .data import MovieMultiDataset
 from .parameters import CoreConfig, ReadoutConfig, Seed, ShifterConfig, ModulatorConfig, \
     DataConfig
+from ..architectures.base import CorePlusReadout3d
 from ..utils.logging import Messager
 from ..utils.measures import corr
-from scipy.stats import stats
-from tqdm import tqdm
 
 PerformanceScores = namedtuple('PerformanceScores', ['pearson'])
 

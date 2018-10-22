@@ -5,6 +5,7 @@ import numpy as np
 from attorch.dataset import H5SequenceSet
 
 import datajoint as dj
+from nips2018.utils import ComputeStub
 from .transforms import Subsequence
 from ..utils.data import h5cached
 from ..utils.logging import Messager
@@ -15,11 +16,6 @@ dj.config['external-file'] = dict(
 
 schema = dj.schema('nips2018_data', locals())
 
-
-class ComputeStub:
-
-    def make(selfk, key):
-        pass
 
 
 @schema
