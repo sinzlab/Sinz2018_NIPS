@@ -10,8 +10,8 @@ services:
     devices:
       - /dev/nvidia{{i}}
     volumes:
-      - Sinz2018_NIPS_data/:/external
-      - notebooks/:/notebooks
+      - ./Sinz2018_NIPS_data/:/external
+      - ./notebooks/:/notebooks
     environment:
       - DISPLAY=$DISPLAY
   {% endfor %}

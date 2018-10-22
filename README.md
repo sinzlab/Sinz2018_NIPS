@@ -13,8 +13,16 @@ Go to a folder of you choice and type the following commands in a [shell of your
 ```bash
 git clone https://github.com/sinzlab/Sinz2018_NIPS.git
 cd Sinz2018_NIPS
+
+# get the data
 gin get cajal/Sinz2018_NIPS_data # might take a while; fast internet recommended
 
+# create a file with DB credentials
+echo "DJ_HOST=archive.datajoint.io" >> .env
+echo "DJ_USER=public" >> .env
+echo "DJ_PASS=public-user" >> .env
+
+# create docker container (possibly you need sudo)
 
 ```
 
