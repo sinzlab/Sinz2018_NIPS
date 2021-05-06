@@ -24,9 +24,9 @@ cd Sinz2018_NIPS
 gin get cajal/Sinz2018_NIPS_data # might take a while; fast internet recommended
 
 # create a file with DB credentials
-echo "DJ_HOST=archive.datajoint.io" >> .env
-echo "DJ_USER=nips" >> .env
-echo "DJ_PASS=nips-submission" >> .env
+echo "DJ_HOST=134.2.118.234" >> .env
+echo "DJ_USER=public_access" >> .env
+echo "DJ_PASS=ffeWQ@7O" >> .env
 
 # create docker container (possibly you need sudo)
 nvidia-docker-compose -t docker-compose.yml.jinja build notebook0
